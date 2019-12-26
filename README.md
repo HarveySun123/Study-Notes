@@ -59,5 +59,48 @@ int main
 最简单的是重载，同一个类中为了省去对新声明函数重新命名的麻烦，可以使用同一函数名，只要参数表不同即可。但是注意返回值类型也必须一致，否则会变成重新定义，是不允许的。
 对于虚方法的覆盖，程序一般运行时，先找到找到类，如果它有基类，再找它的基类，最后运行的是基类中的函数，这时，它在基类中找到的是virtual标识的函数，它就会再回到子类中找同名函数。
 
+2、0xC0000005: 读取位置 0x00000000 时发生访问冲突
+来自：https://blog.csdn.net/heathyhuhu/article/details/18039359
+遇见这种问题一般都是空指针，即：指针里没有赋值~ 
+如果你对null 进行操作就会产生空指针异常
+
+Object obj = new Object();
+你要知道 obj是一个Object指针变量,指向Object类的一个实例
+我们说obj是一个对象 实质是它指向一个对象的首地址 
+如果这个指针变量obj 没有指向任何空间 你调用它的方法和属性就会出错
+
+例如 Object obj = new Object();
+     obj.equals("123");这个是没错的
+
+但换下面语句 Object obj = null;
+     obj.equals("123");就会出现空指针异常
+未处理的异常: 0xC0000005: 读取位置 0x00000000 时发生访问冲突
+
+     在使用的过程中，出现了标题中的错误，首先在网上搜了一些方法，费了好大的劲，终于解决了，
+关于0xC0000005问题：
+0xC0000005: Access Violation错误调试- -
+1》数据越界或是定义的指针未释放.
+2》空的指针的可能性最大。使用指针前最好能显式的赋值！ 
+应该是指针的问题
+3》内存访问错误，检查指针，是否为空，是否越界等
+可能性 3 种 
+1: 
+char *p; 
+p = new char[number]; 
+delete [] p; 
+.... 
+// always using p.... 
+p = xxx; // access violation 
+
+2: 
+char *p; 
+memcpy(p, xxx, number); // access violation 
+
+3: 
+char *p; 
+p = new char[number]; 
+delete [] p; 
+......... 
+delete [] p; // access violation
 
 	
