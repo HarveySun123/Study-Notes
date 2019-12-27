@@ -102,5 +102,176 @@ p = new char[number];
 delete [] p; 
 ......... 
 delete [] p; // access violation
+3、容器QVector、QList
+遍历一
+QList<QVariant>* tagNameList = new QList<QVariant>;
+QStringList *columnlabels = new QStringList;
+	foreach (Sep_LoopTag* looptag,loops)
+	{
+		tagNameList->insert(tagNameList->end(), looptag->tagName);
+		columnlabels->insert(columnlabels->end(), looptag->tagName);
+	}
 
+遍历二
+QStringList p_list = lstRelation[nRow].strPrimaryLoop.split(',');
+QList<QString>::iterator i; 
+for(i=p_list.begin();i<p_list.end();++i)
+	{
+		if(columnlabels->contains(*i),QString::SkipEmptyParts)
+			p_chkList->setChecked(columnlabels->indexOf(*i,1),true);
+	}	
+4、Qt自定义下拉框和多选框
+//继承自QWidget的下拉框
+ComboBoxBase::ComboBoxBase(QWidget *parent)
+: QComboBox(parent)
+{
+}
+ComboBoxBase::~ComboBoxBase()
+{
+}
+void ComboBoxBase::wheelEvent( QWheelEvent * event )
+{
+	return;
+}
+//使用自定义下拉框类
+ComboBoxBase* cmbPlant = new ComboBoxBase;
+foreach (SEP_PLANT plant,plantList)
+{
+	cmbPlant->addItem(plant.name,plant.id);
+	if (lstRelation[nRow].nPlant == plant.id)
+	{
+		cmbPlant->setCurrentText(plant.name);
+	}
+}
+ui->tableWidget->setCellWidget(nRow,0,cmbPlant);
 	
+//多选框
+//头文件
+#ifndef CHECKLISTVIEW_H
+#define CHECKLISTVIEW_H
+
+#include <QListWidget>
+#include <QCheckBox>
+#include <QComboBox>
+
+class CheckListView : public QListWidget
+{
+    Q_OBJECT
+public:
+    CheckListView(QWidget* parent=0, QStringList *columnlabels=NULL, QList<QVariant> *data=NULL, QComboBox* cmb=NULL);
+    ~CheckListView();
+    void getSelectData(QList<QVariant> &data);
+
+    void setChecked(int index,bool checked);
+
+private slots:
+    //QCheckBox复选消息处理
+    void slot_setSelectItem(int state);
+
+
+private:
+    QComboBox         *m_cmbox;
+    QList<bool>       m_bchecked;
+    QList<QVariant>   m_data;
+    QList<QCheckBox*> m_checklist;
+    //QList<QString>    m_fslist;
+};
+
+#endif // CHECKLISTVIEW_H
+//cpp文件
+#include "checklistview.h"
+
+CheckListView::CheckListView(QWidget* parent,QStringList *columnlabels,QList<QVariant> *data,QComboBox* cmb)
+    :QListWidget(parent)
+{
+    setViewMode(QListWidget::ListMode);
+    //setSelectionMode(QAbstractItemView::SingleSelection);
+    m_cmbox = cmb;
+
+    for( int i=0; i<columnlabels->size(); i++ )
+    {
+        m_bchecked.append(false);
+        m_data.append(data->at(i));
+
+        QListWidgetItem *item = new QListWidgetItem();
+        //item->setFlags(Qt::ItemIsSelectable | Qt::ItemIsUserCheckable |Qt::ItemIsEnabled);
+		item->setFlags(Qt::ItemIsUserCheckable);
+        item->setData(Qt::UserRole+1, data->at(i));
+        insertItem(model()->rowCount(), item);
+
+        QCheckBox* box = new QCheckBox(columnlabels->at(i));
+        setItemWidget(item,  box);
+        m_checklist.append(box);
+        //m_fslist.append(columnlabels->at(i));
+        //链接复选状态改变信号槽
+
+        connect(box, SIGNAL(stateChanged(int)), this, SLOT(slot_setSelectItem(int)));
+    }
+}
+
+CheckListView::~CheckListView()
+{
+}
+void CheckListView::getSelectData(QList<QVariant> &data)
+{
+    for( int i=0; i<m_bchecked.size(); i++)
+    {
+        if( m_bchecked.at(i)== true)
+            data.append( m_data.at(i) );
+    }
+}
+
+void CheckListView::slot_setSelectItem(int state)
+{
+	Q_UNUSED(state);
+    QCheckBox*  box = qobject_cast<QCheckBox*>(sender());
+    for( int off = 0;off<m_checklist.size(); off++)
+    {
+        if( box == m_checklist.at(off) )
+        {
+            m_bchecked[off] = (box->checkState() ==  Qt::Checked) ? true : false;
+            break;
+        }
+    }
+
+//    QString strfs;
+	QStringList lstfs;
+    for( int i=0; i<m_bchecked.size(); i++)
+    {
+        if( m_bchecked.at(i)== true)
+        {
+//             if(!strfs.isEmpty())
+//             {
+//                 strfs += ",";
+//             }
+//             strfs += m_fslist.at(i);
+			lstfs << m_checklist[i]->text();
+        }
+    }
+
+    //m_cmbox->setEditText( strfs );
+	m_cmbox->setEditText(lstfs.join(","));
+}
+
+void CheckListView::setChecked(int index,bool checked)
+{
+    if(index >= 0 && index < m_checklist.size())
+    {
+        m_checklist[index]->setChecked(checked);
+    }
+}
+//使用checklist类
+ComboBoxBase* cmbPrimaryLoop = new ComboBoxBase;
+cmbPrimaryLoop->setEditable(true);
+CheckListView* p_chkList = new CheckListView(this,columnlabels,tagNameList,cmbPrimaryLoop);
+cmbPrimaryLoop->setModel(p_chkList->model());
+cmbPrimaryLoop->setView(p_chkList);
+//读取数据库中多项拆开，而后将对应复选框选中
+QStringList p_list = lstRelation[nRow].strPrimaryLoop.split(',',QString::SkipEmptyParts);
+QList<QString>::iterator i; 
+for(i=p_list.begin();i<p_list.end();++i)
+{
+	if(columnlabels->contains(*i))
+		p_chkList->setChecked(columnlabels->indexOf(*i,1),true);
+}
+ui->tableWidget->setCellWidget(nRow,2,cmbPrimaryLoop);
