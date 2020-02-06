@@ -290,7 +290,7 @@ ui->tableWidget->setCellWidget(nRow,2,cmbPrimaryLoop);
 2020.2.6
   今天改SEPSIM的需求，深感小白的煎熬。在一个地方卡了整整一天，具体情况如下：需求是将菜单栏中某菜单上的动作添加到右键，如果在同一类中较为简单，只需将改功能地址传过来就可以。
   例：
-  
+   (```Java
     //菜单栏
     QMenuBar *mBar = menuBar();
 
@@ -305,8 +305,13 @@ ui->tableWidget->setCellWidget(nRow,2,cmbPrimaryLoop);
 
     //工具栏添加快捷键
     toolBar->addAction(pNew);
+    ```)
 这样就相当于把菜单栏中的动作复制一份到工具栏中，将其加到右键也是如此。但是我碰到的情况是：菜单栏和触发右键按钮属于不同对象。右键在画面上触发，而菜单栏在主界面上，在项目中分属两个类。但是，但是，画面是建立在主界面上的：
+(```Java
     itemScene* pic = new itemScene(this);
+```)   
 而如何使pic上的触发信号传到主界面上呢，获取到主界面地址就ok啦。就是在这里，我像傻子一样苦苦追寻。然而只需要一个简单的函数就可以搞定。
+(```Java
     myWidget* par = (myWidget*)parent();
+```)
 接下来就豁然开朗啦，搜答案看到一句话特别棒：写代码是一种艺术，甚于蒙娜丽莎的微笑。
