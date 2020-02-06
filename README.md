@@ -43,6 +43,7 @@ public:
     }   
 }
 ```)
+
 (```C++
 int main
 {
@@ -71,11 +72,19 @@ Object obj = new Object();
 我们说obj是一个对象 实质是它指向一个对象的首地址 
 如果这个指针变量obj 没有指向任何空间 你调用它的方法和属性就会出错
 
-例如 Object obj = new Object();
-     obj.equals("123");这个是没错的
+例如
+(```C++
+Object obj = new Object();
+obj.equals("123");
+```)
+这个是没错的
 
-但换下面语句 Object obj = null;
-     obj.equals("123");就会出现空指针异常
+但换下面语句 
+(```C++
+Object obj = null;
+obj.equals("123");
+```)
+就会出现空指针异常
 未处理的异常: 0xC0000005: 读取位置 0x00000000 时发生访问冲突
 
      在使用的过程中，出现了标题中的错误，首先在网上搜了一些方法，费了好大的劲，终于解决了，
