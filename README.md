@@ -288,7 +288,7 @@ for(i=p_list.begin();i<p_list.end();++i)
 ui->tableWidget->setCellWidget(nRow,2,cmbPrimaryLoop);
 	
 2020.2.6
-  今天改SEPSIM的需求，深感小白的煎熬。在一个地方卡了整整一天，具体情况如下：需求是将菜单栏中某菜单上的动作添加到右键，如果在同一类中较为简单，只需将改功能地址传过来就可以。
+ (一）今天改SEPSIM的需求，深感小白的煎熬。在一个地方卡了整整一天，具体情况如下：需求是将菜单栏中某菜单上的动作添加到右键，如果在同一类中较为简单，只需将改功能地址传过来就可以。
   例：
    (```Java
     //菜单栏
@@ -315,3 +315,4 @@ ui->tableWidget->setCellWidget(nRow,2,cmbPrimaryLoop);
     myWidget* par = (myWidget*)parent();
 ```)
 接下来就豁然开朗啦，搜答案看到一句话特别棒：写代码是一种艺术，甚于蒙娜丽莎的微笑。
+（二）看到C++Primer 里面Vector的部分，提到使用下标访问空容器或数组时，会造成缓冲区溢出（Buffer overflow），当然下表大于等于元素个数也会溢出，之前在这栽过很多次。提到一句：使用范围for语句可以确保下标访问有效，乍一看不太明白，应该指的范围是X.size()吧。
